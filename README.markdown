@@ -17,8 +17,8 @@ A valid Economist subscription and online account
 3. Enjoy your Economist
 
 
-## Author and Copyright
-Copyright: Mark Percival
-License: MIT
+## Copyright, License and Disclaimer
 
-It's a scraper, so it's gonna fucking break - Don't email me about it, just fix it yourself :)
+* Copyright: Mark Percival
+* License: MIT
+* Disclaimer - It's a scraper, so it's gonna fucking break - Don't email me about it, just fix it yourself :)
