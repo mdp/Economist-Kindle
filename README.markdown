@@ -1,6 +1,6 @@
 # The Economist Kindle Scraper
 
-Get the 'real' Economist on your Kindle - _The official Kindle subscription only includes online articles_
+Get the 'real' Economist on your Kindle (_The official Kindle subscription only includes online articles_)
 
 ## Requirements
 
@@ -8,7 +8,7 @@ A valid Economist subscription and online account
 
 ## Usage
 
-1. Create a credentials.yml file from the sample. Fill in the details including the recipient and the smtp account. _I use a gmail account_
+1. Create a credentials.yml file from the sample. Fill in the details including the recipient and the smtp account. (_I use a gmail account_)
   
 2. Run
 

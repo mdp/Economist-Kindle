@@ -16,7 +16,7 @@ ActionMailer::Base.smtp_settings = {
 class EconomistMailer < ActionMailer::Base
 
   def issue(email, title, html)
-    puts "Delivering to #{email} - #{title} \n #{html}"
+    puts "Delivering to #{email} - #{title}"
     recipients      email
     subject         title
     from            "#{ActionMailer::Base.smtp_settings[:user_name]}@#{ActionMailer::Base.smtp_settings[:domain]}"
