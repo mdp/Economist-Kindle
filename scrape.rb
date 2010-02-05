@@ -2,7 +2,8 @@ require 'rubygems'
 require 'date'
 require 'mechanize'
 require 'haml'
-require 'activesupport'
+require 'active_support'
+require 'action_mailer'
 require 'mailer'
 
 class Article
@@ -49,38 +50,84 @@ class Article
 
 end
 
-agent = WWW::Mechanize.new
+class Magazine
+  
+  attr_reader :date, :html
+  
+  def self.build(sections, date)
+    html = Haml::Engine.new(File.read('economist.html.haml')).render(Object.new, :sections => sections)
+    self.new(html, date)
+  end
+  
+  def self.load_backissue(date)
+    html = File.read("editions/#{date.strftime('%d-%b-%Y')}-economist.html")
+    self.new(html, date)
+  end
+  
+  def initialize(html, date)
+    @html = html
+    @date = date
+  end
+  
+  def archive
+    File.open("editions/#{@date.strftime('%d-%b-%Y')}-economist.html", 'w').puts(html)
+  end
+  
+  
+  def mail(recipients)
+    EconomistMailer.deliver_issue(recipients, "Economist - #{@date.strftime('%d %b %Y')}.html", html)
+  end
+  
+end
+
+
+class Scraper
+  
+  def self.scrape(email, pass)
+    agent = WWW::Mechanize.new
+    if File.exists?('cookies.yml')
+      agent.cookie_jar.load('cookies.yml')
+    end
+
+    page = agent.get 'http://economist.com/printedition'
+
+    if page.forms && page.forms.last.action =~ /payBarrier/
+      p "Logging in"
+      form.email_address = email
+      form.pword = pass
+      page = agent.submit form
+      agent.cookie_jar.save_as('cookies.yml')
+    end
+
+    date = Date.parse(page.root.css('span.article-date').text)
+
+    links = page.links.reject {|l| !(l.href =~ /story_id=[0-9]+$/i)}
+    links.uniq!
+
+    articles = links.collect { |l| Article.new(l, agent) }
+
+    sections = ActiveSupport::OrderedHash.new
+    articles.each do |article|
+      sections[article.section] ||= []
+      sections[article.section] << article
+    end
+    
+    Magazine.build(sections, date)
+  end
+
+end
+
+
+
 credentials = YAML.load_file('credentials.yml')['economist']
-if File.exists?('cookies.yml')
-  agent.cookie_jar.load('cookies.yml')
-end
-
-page = agent.get 'http://economist.com/printedition'
-
-if page.forms && page.forms.last.action =~ /payBarrier/
-  p "Logging in"
-  form.email_address = credentials['email']
-  form.pword = credentials['password']
-  page = agent.submit form
-  agent.cookie_jar.save_as('cookies.yml')
-end
-
-magazine_date = Date.parse(page.root.css('span.article-date').text)
-
-links = page.links.reject {|l| !(l.href =~ /story_id=[0-9]+$/i)}
-links.uniq!
-
-articles = links.collect { |l| Article.new(l, agent) }
-
-sections = ActiveSupport::OrderedHash.new
-articles.each do |article|
-  sections[article.section] ||= []
-  sections[article.section] << article
-end
-
-magazine = Haml::Engine.new(File.read('economist.html.haml')).render(Object.new, :sections => sections)
-
-File.open("editions/#{magazine_date.strftime('%d-%b-%Y')}-economist.html", 'w').puts(magazine)
-
 recipients = YAML.load_file('credentials.yml')['recipients']
-EconomistMailer.deliver_issue(recipients, "Economist - #{magazine_date.strftime('%d %b %Y')}.html", magazine)
+
+magazine = Scraper.scrape(credentials[:email], credentials[:password])
+magazine.archive
+
+# magazine = Magazine.load_backissue(Date.parse("Dec-05-2009"))
+
+magazine.mail(recipients)
+
+
+

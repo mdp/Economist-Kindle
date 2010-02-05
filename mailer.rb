@@ -1,6 +1,6 @@
 require 'yaml'
 require 'rubygems'
-require 'actionmailer'
+require 'action_mailer'
 
 credentials = YAML.load_file("credentials.yml")['email']
 ActionMailer::Base.smtp_settings = {
