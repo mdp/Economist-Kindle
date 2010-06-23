@@ -2,25 +2,26 @@
 %html
   %head
     %title Mark Percival's Bootleg Economist
+    %link{:rel =>'Stylesheet', :type => 'text/css', :href => '/manifest_destiny/css/md.css'}
+    %script{:type => 'text/javascript', :src => '/javascripts/jquery-1.4.2.min.js'}
+    %script{:type => 'text/javascript', :src => '/manifest_destiny/js/md.js'}
   %body
-    #cover
-      %center
+    #toolbar
+      .back_button Home
+      .center
         %h1 Mark Percival's Bootleg Economist
-    #toc
-      %p
-        Table of Contents
-      -sections.each_pair do |section, articles|
-        %h3= section
-        - articles.each do |article|
-          %p
-            %a{:href => "##{article.id}"}
-              = article.title.capitalize
-    %mbp:pagebreak
-    -sections.each_pair do |section, articles|
-      - articles.each do |article|
-        %p
-          %a{ :name => "##{article.id}" }
-        %p
-          = article.content
-        %mbp:pagebreak
-
+    #page
+      #toc
+        %h2
+          Table of Contents
+        -sections.each_pair do |section, articles|
+          %h3.section_header= section
+          %ul
+            - articles.each do |article|
+              %li{:class => 'item', :id => "_#{article[:id]}" }
+                = article[:title].capitalize
+      #content
+        -sections.each_pair do |section, articles|
+          - articles.each do |article|
+            %div{ :id => "#{article[:id]}", :class => 'article' }
+              = article[:content]
