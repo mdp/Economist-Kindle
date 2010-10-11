@@ -10,7 +10,7 @@ require 'magazine'
 # require 'mailer'
 
 class Scraper
-  
+
   def self.scrape(email, pass)
     agent = Mechanize.new
     if File.exists?('cookies.yml')
@@ -32,12 +32,15 @@ class Scraper
     links = page.links.reject {|l| !(l.href =~ /story_id=[0-9]+$/i)}
     links.uniq!
 
-    articles = links.collect { |l| Article.scrape(l, agent) }
-   
-    File.open("editions/#{date.strftime('%d-%b-%Y')}/contents.yml", 'w').puts(articles.to_yaml)
+    articles = links.collect { |l| 
+      a = Article.scrape(l, agent)
+      p "#{a[:section]} - #{a[:headline]}"
+      a
+    }
 
-    mag = Magazine.new(articles, date)
-    mag.archive
+    File.open("editions/#{date.strftime('%d-%b-%Y')}.json", 'w').puts(articles.to_json)
+
+
   end
 
 end

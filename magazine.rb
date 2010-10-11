@@ -1,16 +1,16 @@
 require 'time'
-require 'yaml'
+require 'json'
 require 'haml'
 
 class Magazine
-  
+
   attr_reader :date, :articles
-  
+
   def self.load(date)
-    article_list = YAML.load_file("#{File.dirname(__FILE__)}/editions/#{date.strftime('%d-%b-%Y')}/contents.yml")
+    article_list = JSON.parse(File.open("#{File.dirname(__FILE__)}/editions/#{date.strftime('%d-%b-%Y')}/contents.json"))
     return Magazine.new(article_list, date)
   end
-  
+
   # Takes content as yaml
   def initialize(articles, date)
     @articles = articles
@@ -34,6 +34,6 @@ class Magazine
     html = Haml::Engine.new(File.read("#{File.dirname(__FILE__)}/economist.html.haml")).render(
 	      Object.new, :sections => sections)
   end
-    
+
 end
 
