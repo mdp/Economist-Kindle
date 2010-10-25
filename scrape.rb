@@ -33,7 +33,7 @@ class Scraper
     links.uniq!
 
     articles = links.collect { |l| 
-      a = Article.scrape(l, agent)
+      a = Article.scrape(l, agent, date)
       p "#{a[:section]} - #{a[:headline]}"
       a
     }

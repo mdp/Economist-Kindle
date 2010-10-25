@@ -1,13 +1,14 @@
 class Article
 
-  def self.scrape(link, agent)
-    article = self.new(link, agent)
+  def self.scrape(link, agent, date)
+    article = self.new(link, agent, date)
     article.to_hash
   end
 
-  def initialize(link, agent)
+  def initialize(link, agent, date)
     @link = link
     @agent = agent
+    @date = date
   end
 
   def page
@@ -51,7 +52,8 @@ class Article
   def to_hash
     {
       :id => id, :title => title, :section => section,
-      :content => content, :headline => headline, :rubric => rubric
+      :content => content, :headline => headline, :rubric => rubric,
+      :edition_date => @date.to_s
     }
   end
 

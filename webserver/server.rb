@@ -9,7 +9,7 @@ get '/' do
   haml :magazine
 end
 
-get '/latest' do
+get '/latest.json' do
   editions = Dir.glob('editions/*.json')
   current_edition = editions.collect { |e|
       Time.parse(e.gsub('.json', ''))
@@ -25,7 +25,7 @@ get '/current_edition.json' do
       Time.parse(e.gsub('.json', ''))
     }.sort.reverse.first
   content_type 'application/js'
-  {:current_editions => current_edition.to_s}.to_json
+  {:latest_publish_date => current_edition.to_s}.to_json
 end
 
 
